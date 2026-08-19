@@ -121,41 +121,55 @@
   }
 
   async function subscribeToNotifications() {
+    console.log("[Push] Subscribe triggered.");
     if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+      console.warn("[Push] Push API or Service Worker not supported.");
       showToast("Push not supported");
       return;
     }
 
     try {
       showToast("Requesting...", 0);
+      console.log("[Push] Requesting Notification permission...");
       const permission = await Notification.requestPermission();
+      console.log("[Push] Permission result:", permission);
+      
       if (permission !== 'granted') {
         showToast("Permission denied");
         return;
       }
 
+      console.log("[Push] Waiting for service worker registration...");
       const registration = await navigator.serviceWorker.ready;
+      console.log("[Push] SW Registration found:", registration);
+      
       const publicVapidKey = import.meta.env.VITE_PUBLIC_VAPID_KEY || import.meta.env.PUBLIC_VAPID_KEY || "BJMBP6HaQ96Xfk7Wflx4hSx1P9UntGGUiqHvlzu8sutRdEqg5JTBP9DYBiSDf4aIybkAxWr4fSSfYe_eAu4JnrQ";
+      console.log("[Push] Using VAPID Key:", publicVapidKey);
       
       const convertedVapidKey = urlBase64ToUint8Array(publicVapidKey);
+      console.log("[Push] Converted Uint8Array length:", convertedVapidKey.length);
 
+      console.log("[Push] Calling pushManager.subscribe()...");
       const subscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: convertedVapidKey
       });
+      console.log("[Push] Subscription successful:", subscription);
 
       const subJson = subscription.toJSON();
+      console.log("[Push] Extracted JSON payload:", subJson);
       
-      // Prevent duplicates: you might want to check if endpoint already exists
+      console.log("[Push] Sending to PocketBase...");
       await pb.collection('push_subscriptions').create({
         endpoint: subJson.endpoint,
         p256dh: subJson.keys.p256dh,
         auth: subJson.keys.auth
       });
+      console.log("[Push] PocketBase record created successfully!");
 
       showToast("Subscribed!");
     } catch (err) {
-      console.error(err);
+      console.error("[Push] FATAL ERROR:", err);
       showToast("Subscription failed");
     }
   }
