@@ -143,7 +143,7 @@
       const registration = await navigator.serviceWorker.ready;
       console.log("[Push] SW Registration found:", registration);
       
-      const publicVapidKey = import.meta.env.VITE_PUBLIC_VAPID_KEY || import.meta.env.PUBLIC_VAPID_KEY || "BJMBP6HaQ96Xfk7Wflx4hSx1P9UntGGUiqHvlzu8sutRdEqg5JTBP9DYBiSDf4aIybkAxWr4fSSfYe_eAu4JnrQ";
+      const publicVapidKey = import.meta.env.VITE_PUBLIC_VAPID_KEY || import.meta.env.PUBLIC_VAPID_KEY || "BAEkBmbs09WMAsxXydrUw49HjRpToavk2b6Yjp7U4fFXD727e9Va8eEWdt_c63WkPZ4b51O1RtPd2IaK9Ac2f0s";
       console.log("[Push] Using VAPID Key:", publicVapidKey);
       
       const convertedVapidKey = urlBase64ToUint8Array(publicVapidKey);
