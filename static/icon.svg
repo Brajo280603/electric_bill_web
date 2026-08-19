@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Flat emerald green rounded square background -->
+  <rect width="512" height="512" rx="112" ry="112" fill="#10b981" />
+  
+  <!-- Flat white upward lightning/graph icon -->
+  <!-- We'll draw a thick path combining a graph going up with a lightning bolt edge -->
+  <path d="M120 320 L240 180 L280 260 L400 120" fill="none" stroke="#ffffff" stroke-width="48" stroke-linecap="round" stroke-linejoin="round" />
+  
+  <!-- Arrowhead at the top right -->
+  <path d="M330 120 L400 120 L400 190" fill="none" stroke="#ffffff" stroke-width="48" stroke-linecap="round" stroke-linejoin="round" />
+
+  <!-- Adding a base bar chart aesthetic below -->
+  <rect x="140" y="360" width="40" height="60" rx="10" fill="#ffffff" />
+  <rect x="220" y="320" width="40" height="100" rx="10" fill="#ffffff" />
+  <rect x="300" y="380" width="40" height="40" rx="10" fill="#ffffff" />
+  <rect x="380" y="240" width="40" height="180" rx="10" fill="#ffffff" />
+</svg>
