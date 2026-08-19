@@ -121,63 +121,48 @@
   }
 
   async function subscribeToNotifications() {
-    console.log("[Push] Subscribe triggered.");
     if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
-      console.warn("[Push] Push API or Service Worker not supported.");
       showToast("Push not supported");
       return;
     }
 
     try {
       showToast("Requesting...", 0);
-      console.log("[Push] Requesting Notification permission...");
       const permission = await Notification.requestPermission();
-      console.log("[Push] Permission result:", permission);
       
       if (permission !== 'granted') {
         showToast("Permission denied");
         return;
       }
 
-      console.log("[Push] Waiting for service worker registration...");
       const registration = await navigator.serviceWorker.ready;
-      console.log("[Push] SW Registration found:", registration);
       
-      const publicVapidKey = import.meta.env.VITE_PUBLIC_VAPID_KEY || import.meta.env.PUBLIC_VAPID_KEY || "BAEkBmbs09WMAsxXydrUw49HjRpToavk2b6Yjp7U4fFXD727e9Va8eEWdt_c63WkPZ4b51O1RtPd2IaK9Ac2f0s";
-      console.log("[Push] Using VAPID Key:", publicVapidKey);
+      const publicVapidKey = import.meta.env.VITE_PUBLIC_VAPID_KEY || import.meta.env.PUBLIC_VAPID_KEY;
+      if (!publicVapidKey) throw new Error("Missing VAPID key in environment variables");
       
       const convertedVapidKey = urlBase64ToUint8Array(publicVapidKey);
-      console.log("[Push] Converted Uint8Array length:", convertedVapidKey.length);
 
-      console.log("[Push] Checking for existing broken subscriptions...");
       const existingSub = await registration.pushManager.getSubscription();
       if (existingSub) {
-        console.log("[Push] Found existing subscription. Unsubscribing to reset state...");
         await existingSub.unsubscribe();
-        console.log("[Push] Old subscription removed.");
       }
 
-      console.log("[Push] Calling pushManager.subscribe()...");
       const subscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: convertedVapidKey
       });
-      console.log("[Push] Subscription successful:", subscription);
 
       const subJson = subscription.toJSON();
-      console.log("[Push] Extracted JSON payload:", subJson);
       
-      console.log("[Push] Sending to PocketBase...");
       await pb.collection('push_subscriptions').create({
         endpoint: subJson.endpoint,
         p256dh: subJson.keys.p256dh,
         auth: subJson.keys.auth
       });
-      console.log("[Push] PocketBase record created successfully!");
 
       showToast("Subscribed!");
     } catch (err) {
-      console.error("[Push] FATAL ERROR:", err);
+      console.error(err);
       showToast("Subscription failed");
     }
   }
