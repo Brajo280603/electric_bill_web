@@ -29,6 +29,18 @@
     }
   }
 
+  // Utility to convert VAPID key to Uint8Array required by PushManager
+  function urlBase64ToUint8Array(base64String) {
+    const padding = '='.repeat((4 - base64String.length % 4) % 4);
+    const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
+    const rawData = window.atob(base64);
+    const outputArray = new Uint8Array(rawData.length);
+    for (let i = 0; i < rawData.length; ++i) {
+      outputArray[i] = rawData.charCodeAt(i);
+    }
+    return outputArray;
+  }
+
   // GROUPING MATH & DATA DERIVATION
   let chartData = $derived.by(() => {
     let labels = [];
@@ -125,9 +137,11 @@
       const registration = await navigator.serviceWorker.ready;
       const publicVapidKey = import.meta.env.VITE_PUBLIC_VAPID_KEY || import.meta.env.PUBLIC_VAPID_KEY || "BJMBP6HaQ96Xfk7Wflx4hSx1P9UntGGUiqHvlzu8sutRdEqg5JTBP9DYBiSDf4aIybkAxWr4fSSfYe_eAu4JnrQ";
       
+      const convertedVapidKey = urlBase64ToUint8Array(publicVapidKey);
+
       const subscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
-        applicationServerKey: publicVapidKey
+        applicationServerKey: convertedVapidKey
       });
 
       const subJson = subscription.toJSON();
