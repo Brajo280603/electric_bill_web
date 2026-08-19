@@ -149,6 +149,14 @@
       const convertedVapidKey = urlBase64ToUint8Array(publicVapidKey);
       console.log("[Push] Converted Uint8Array length:", convertedVapidKey.length);
 
+      console.log("[Push] Checking for existing broken subscriptions...");
+      const existingSub = await registration.pushManager.getSubscription();
+      if (existingSub) {
+        console.log("[Push] Found existing subscription. Unsubscribing to reset state...");
+        await existingSub.unsubscribe();
+        console.log("[Push] Old subscription removed.");
+      }
+
       console.log("[Push] Calling pushManager.subscribe()...");
       const subscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
